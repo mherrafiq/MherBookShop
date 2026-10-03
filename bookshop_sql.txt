@@ -1,0 +1,89 @@
+Karachi@12345
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1.sql command :
+CREATE SCHEMA `test` ;
+
+1. AI ( auto-increment) 
+
+
+2.sql comand:
+CREATE TABLE `test`.`books` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(45) NOT NULL,
+  `desc` VARCHAR(255) NOT NULL,
+  `cover` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));
+
+
+3. sql comand :
+SELECT * FROM test.books;
+
+
+4.sql comand:
+INSERT INTO `test`.`books` (`id`, `title`, `desc`, `cover`) VALUES ('1', 'test title', 'desc', 'cover.png');
+
+5.ALTER TABLE `test`.`books` 
+ADD COLUMN `price` INT NOT NULL AFTER `cover`;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend:
+-npm init -y ( comannd for package.json)
+-npm i express mysql nodemon( package-lock.json & nodemodules)
+
+backend:
+npm i cors
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+frontend:
+Run npx -y create-react-app . inside the client folder.
+Install axios and lucide-react (for icons) in client.
+
+
+frontend:
+npm i axios
+
+
+frontend: npm i react-router-dom
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+//inner join
+SELECT 
+            cart.id AS cart_id,
+            cart.user_id,
+            users.username,
+            users.email,
+            books.id,
+            books.title,
+            books.desc,
+            books.price,
+            books.cover,
+            cart.quantity AS qty,
+            cart.added_at
+        FROM cart
+        JOIN users ON cart.user_id = users.id
+        JOIN books ON cart.book_id = books.id
+        WHERE cart.user_id = ?
+        ORDER BY cart.added_at DESC
+
+
+query:
+CREATE TABLE `cart` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `book_id` int NOT NULL,
+  `quantity` int DEFAULT '1',
+  `added_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_cart_users_idx` (`user_id`),
+  KEY `fk_cart_books_idx` (`book_id`),
+  CONSTRAINT `fk_cart_books` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_cart_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+
+
