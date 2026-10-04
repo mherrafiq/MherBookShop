@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, UserCheck, LogOut, BookOpen, Heart, ShoppingBag, User } from 'lucide-react';
+import { Eye, EyeOff, LogOut, BookOpen, Heart, ShoppingBag, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';

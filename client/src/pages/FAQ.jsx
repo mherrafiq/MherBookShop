@@ -9,15 +9,12 @@ import {
   Printer,
   RotateCcw,
   UserCheck,
-  ExternalLink,
   MessageSquare,
   Phone,
   Mail,
-  CheckCircle2,
   X,
   Sparkles,
   ArrowRight,
-  BookOpen,
   Share2,
   Check
 } from 'lucide-react';

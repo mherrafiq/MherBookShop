@@ -6,7 +6,6 @@ import {
   Phone,
   MessageSquare,
   ChevronRight,
-  Clock,
   ExternalLink
 } from 'lucide-react';
 
