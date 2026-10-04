@@ -25,11 +25,13 @@ const upload = multer({ storage });
 
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Karachi@12345",
-    database: "test"
-})
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "Karachi@12345",
+    database: process.env.DB_NAME || "test",
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
+});
 
 app.use(express.json());
 app.use(cors());
@@ -313,10 +315,11 @@ app.delete("/cart/clear/:userId", (req, res) => {
 
 
 
-app.listen(8800, (err) => {
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, (err) => {
     if (err) {
         console.error("Error starting server:", err);
         return;
     }
-    console.log("connected to backend!");
+    console.log(`connected to backend on port ${PORT}!`);
 });

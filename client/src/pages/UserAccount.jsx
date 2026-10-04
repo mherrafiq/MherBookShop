@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { API_BASE_URL } from '../config';
 
 const UserAccount = () => {
   const { currentUser, login, logout } = useAuth();
@@ -52,7 +53,7 @@ const UserAccount = () => {
     setIsLoginLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:8800/login', {
+      const res = await axios.post(`${API_BASE_URL}/login`, {
         usernameOrEmail: loginData.usernameOrEmail,
         password: loginData.password
       });
@@ -98,7 +99,7 @@ const UserAccount = () => {
     setIsRegisterLoading(true);
 
     try {
-      await axios.post('http://localhost:8800/register', {
+      await axios.post(`${API_BASE_URL}/register`, {
         email: registerData.email,
         password: registerData.password
       });

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import { API_BASE_URL } from '../config';
 
 const CartContext = createContext();
 
@@ -12,7 +13,7 @@ export const CartProvider = ({ children }) => {
   // Fetch cart items from backend for logged in user, or from local storage for guest
   const fetchUserCart = useCallback(async (userId) => {
     try {
-      const res = await axios.get(`http://localhost:8800/cart/${userId}`);
+      const res = await axios.get(`${API_BASE_URL}/cart/${userId}`);
       if (Array.isArray(res.data)) {
         setCartItems(res.data);
       }
@@ -56,7 +57,7 @@ export const CartProvider = ({ children }) => {
 
     if (currentUser && currentUser.id && isDbBook) {
       try {
-        await axios.post('http://localhost:8800/cart', {
+        await axios.post(`${API_BASE_URL}/cart`, {
           userId: currentUser.id,
           bookId: parseInt(book.id),
           quantity: 1
@@ -86,7 +87,7 @@ export const CartProvider = ({ children }) => {
 
     if (currentUser && currentUser.id && isDbBook) {
       try {
-        await axios.put(`http://localhost:8800/cart/${currentUser.id}/${id}`, {
+        await axios.put(`${API_BASE_URL}/cart/${currentUser.id}/${id}`, {
           quantity: newQty
         });
         await fetchUserCart(currentUser.id);
@@ -109,7 +110,7 @@ export const CartProvider = ({ children }) => {
 
     if (currentUser && currentUser.id && isDbBook) {
       try {
-        await axios.delete(`http://localhost:8800/cart/${currentUser.id}/${id}`);
+        await axios.delete(`${API_BASE_URL}/cart/${currentUser.id}/${id}`);
         await fetchUserCart(currentUser.id);
         return;
       } catch (err) {
@@ -123,7 +124,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (currentUser && currentUser.id) {
       try {
-        await axios.delete(`http://localhost:8800/cart/clear/${currentUser.id}`);
+        await axios.delete(`${API_BASE_URL}/cart/clear/${currentUser.id}`);
       } catch (err) {
         console.error("Error clearing cart:", err);
       }

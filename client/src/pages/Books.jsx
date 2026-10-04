@@ -5,6 +5,7 @@ import { Trash2, Edit3, Star, ShoppingCart, Check, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { DUMMY_BOOKS_BY_CATEGORY, ALL_DUMMY_BOOKS } from '../data/dummyBooks';
+import { API_BASE_URL } from '../config';
 
 const Books = () => {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,7 @@ const Books = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const res = await axios.get("http://localhost:8800/books");
+        const res = await axios.get(`${API_BASE_URL}/books`);
         const data = Array.isArray(res.data) ? res.data : [];
         setDbBooks(data);
       } catch (err) {
@@ -55,7 +56,7 @@ const Books = () => {
     }
 
     try {
-      await axios.delete("http://localhost:8800/books/" + book.id);
+      await axios.delete(`${API_BASE_URL}/books/` + book.id);
       setDisplayedBooks(prev => prev.filter(b => b.id !== book.id));
       setDbBooks(prev => prev.filter(b => b.id !== book.id));
     } catch (err) {

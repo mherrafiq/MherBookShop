@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { ALL_DUMMY_BOOKS } from '../data/dummyBooks';
+import { API_BASE_URL } from '../config';
 
 const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -22,7 +23,7 @@ const Navbar = () => {
 
   // Fetch books once and combine with dummy books for search
   useEffect(() => {
-    axios.get('http://localhost:8800/books')
+    axios.get(`${API_BASE_URL}/books`)
       .then(res => {
         const backendBooks = Array.isArray(res.data) ? res.data : [];
         setAllBooks([...backendBooks, ...ALL_DUMMY_BOOKS]);

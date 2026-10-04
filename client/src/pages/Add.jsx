@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, UploadCloud } from 'lucide-react'
+import { API_BASE_URL } from '../config'
 
 const Add = () => {
   const [book, setBook] = useState({
@@ -25,10 +26,10 @@ const Add = () => {
       if (file) {
         const formData = new FormData();
         formData.append("image", file);
-        const res = await axios.post("http://localhost:8800/upload", formData);
+        const res = await axios.post(`${API_BASE_URL}/upload`, formData);
         coverUrl = res.data.imageUrl;
       }
-      await axios.post("http://localhost:8800/books", { ...book, cover: coverUrl });
+      await axios.post(`${API_BASE_URL}/books`, { ...book, cover: coverUrl });
       navigate("/");
     } catch (err) {
       console.log(err);
