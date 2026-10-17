@@ -215,8 +215,8 @@ app.post("/cart", (req, res) => {
 // Get cart items for a specific user with book details
 app.get("/cart/:userId", (req, res) => {
     const userId = req.params.userId;
-   
-   //innerjoin
+
+    //innerjoin
     const q = `
         SELECT 
             cart.id AS cart_id,

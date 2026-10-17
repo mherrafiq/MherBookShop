@@ -25,10 +25,16 @@ const Update = () => {
     try {
       let coverUrl = book.cover;
       if (file) {
+        // Cloudinary free unsigned upload
         const formData = new FormData();
-        formData.append("image", file);
-        const res = await axios.post(`${API_BASE_URL}/upload`, formData);
-        coverUrl = res.data.imageUrl;
+        formData.append("file", file);
+        formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET || "ml_default");
+        const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD || "demo";
+        const res = await axios.post(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          formData
+        );
+        coverUrl = res.data.secure_url;
       }
       await axios.put(`${API_BASE_URL}/books/` + id, { ...book, cover: coverUrl });
       navigate("/");

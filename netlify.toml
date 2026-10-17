@@ -6,6 +6,50 @@
 [build.environment]
   CI = "false"
 
+[functions]
+  directory = "../netlify/functions"
+  node_bundler = "esbuild"
+
+# Books API routes
+[[redirects]]
+  from = "/api/books/*"
+  to = "/.netlify/functions/books"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/books"
+  to = "/.netlify/functions/books"
+  status = 200
+  force = true
+
+# Cart API routes
+[[redirects]]
+  from = "/api/cart/*"
+  to = "/.netlify/functions/cart"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/cart"
+  to = "/.netlify/functions/cart"
+  status = 200
+  force = true
+
+# Auth routes
+[[redirects]]
+  from = "/api/login"
+  to = "/.netlify/functions/login"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/register"
+  to = "/.netlify/functions/register"
+  status = 200
+  force = true
+
+# SPA fallback - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
