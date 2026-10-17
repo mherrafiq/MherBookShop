@@ -8,7 +8,9 @@
 
 [functions]
   directory = "../netlify/functions"
-  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
 
 # Books API routes
 [[redirects]]
