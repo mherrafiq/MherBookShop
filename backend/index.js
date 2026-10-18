@@ -40,7 +40,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // upload image
 app.post('/upload', upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json('No file uploaded.');
-    const imageUrl = `http://localhost:8800/uploads/${req.file.filename}`;
+    const host = req.get('host');
+    const protocol = req.protocol;
+    const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
     return res.json({ imageUrl });
 });
 

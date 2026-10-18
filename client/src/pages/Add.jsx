@@ -13,6 +13,9 @@ const Add = () => {
   });
   const [file, setFile] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,24 +24,39 @@ const Add = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     try {
       let coverUrl = book.cover;
       if (file) {
-        // Cloudinary free unsigned upload
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET || "ml_default");
-        const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD || "demo";
-        const res = await axios.post(
-          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-          formData
-        );
-        coverUrl = res.data.secure_url;
+        if (
+          process.env.REACT_APP_CLOUDINARY_CLOUD &&
+          process.env.REACT_APP_CLOUDINARY_CLOUD !== 'demo' &&
+          process.env.REACT_APP_CLOUDINARY_PRESET
+        ) {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
+          const res = await axios.post(
+            `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD}/image/upload`,
+            formData
+          );
+          coverUrl = res.data.secure_url;
+        } else {
+          // Upload directly to backend
+          const formData = new FormData();
+          formData.append("image", file);
+          const res = await axios.post(`${API_BASE_URL}/upload`, formData);
+          coverUrl = res.data.imageUrl;
+        }
       }
       await axios.post(`${API_BASE_URL}/books`, { ...book, cover: coverUrl });
       navigate("/");
     } catch (err) {
-      console.log(err);
+      console.error("Error adding book:", err);
+      setError(err?.response?.data || err.message || "Failed to add book.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,9 +135,15 @@ const Add = () => {
           </div>
         </div>
 
+        {error && (
+          <div style={{ color: '#ef4444', backgroundColor: '#fee2e2', padding: '10px 14px', borderRadius: '8px', marginTop: '15px' }}>
+            {typeof error === 'string' ? error : JSON.stringify(error)}
+          </div>
+        )}
+
         <div className="form-actions" style={{ flexDirection: 'row', marginTop: '30px' }}>
-          <button className="btn btn-primary" onClick={handleClick} style={{ flex: 1 }}>
-            Add Book
+          <button className="btn btn-primary" onClick={handleClick} disabled={loading} style={{ flex: 1 }}>
+            {loading ? 'Adding Book...' : 'Add Book'}
           </button>
           <button className="btn btn-secondary" onClick={() => navigate('/')} style={{ flex: 1 }}>
             <ArrowLeft size={16} />
