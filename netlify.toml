@@ -12,6 +12,13 @@
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
 
+# Upload API route
+[[redirects]]
+  from = "/api/upload"
+  to = "/.netlify/functions/upload"
+  status = 200
+  force = true
+
 # Books API routes
 [[redirects]]
   from = "/api/books/*"

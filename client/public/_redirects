@@ -1,1 +1,8 @@
-/*    /index.html   200
+/api/upload    /.netlify/functions/upload   200!
+/api/books/*   /.netlify/functions/books    200!
+/api/books     /.netlify/functions/books    200!
+/api/cart/*    /.netlify/functions/cart     200!
+/api/cart      /.netlify/functions/cart     200!
+/api/login     /.netlify/functions/login    200!
+/api/register  /.netlify/functions/register 200!
+/*             /index.html                  200

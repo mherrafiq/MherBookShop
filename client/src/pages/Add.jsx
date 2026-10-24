@@ -4,6 +4,37 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, UploadCloud } from 'lucide-react'
 import { API_BASE_URL } from '../config'
 
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > height && width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => resolve(event.target.result);
+    };
+    reader.onerror = () => resolve(null);
+  });
+};
+
 const Add = () => {
   const [book, setBook] = useState({
     title: "",
@@ -29,32 +60,35 @@ const Add = () => {
     try {
       let coverUrl = book.cover;
       if (file) {
-        if (
-          process.env.REACT_APP_CLOUDINARY_CLOUD &&
-          process.env.REACT_APP_CLOUDINARY_CLOUD !== 'demo' &&
-          process.env.REACT_APP_CLOUDINARY_PRESET
-        ) {
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
-          const res = await axios.post(
-            `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD}/image/upload`,
-            formData
-          );
-          coverUrl = res.data.secure_url;
-        } else {
-          // Upload directly to backend
-          const formData = new FormData();
-          formData.append("image", file);
-          const res = await axios.post(`${API_BASE_URL}/upload`, formData);
-          coverUrl = res.data.imageUrl;
-        }
+        const base64Data = await compressImage(file);
+        const res = await axios.post(`${API_BASE_URL}/upload`, {
+          image: base64Data,
+          name: file.name,
+        });
+        coverUrl = res.data?.imageUrl || coverUrl;
       }
       await axios.post(`${API_BASE_URL}/books`, { ...book, cover: coverUrl });
       navigate("/");
     } catch (err) {
       console.error("Error adding book:", err);
-      setError(err?.response?.data || err.message || "Failed to add book.");
+      let msg = "Failed to add book.";
+      if (err?.response?.data) {
+        if (typeof err.response.data === 'string') {
+          if (err.response.data.includes('<title>')) {
+            const titleMatch = err.response.data.match(/<title>(.*?)<\/title>/i);
+            msg = titleMatch ? titleMatch[1] : "Server route not found (404)";
+          } else {
+            msg = err.response.data;
+          }
+        } else if (err.response.data.error) {
+          msg = err.response.data.error;
+        } else {
+          msg = JSON.stringify(err.response.data);
+        }
+      } else if (err.message) {
+        msg = err.message;
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -111,12 +145,12 @@ const Add = () => {
             <div className="form-group" style={{ height: '100%' }}>
               <label htmlFor="cover">Cover Image</label>
               <div className="file-upload-wrapper" style={{ flex: 1 }}>
-                {file && (
+                {(file || book.cover) && (
                   <img
-                    src={URL.createObjectURL(file)}
+                    src={file ? URL.createObjectURL(file) : book.cover}
                     alt="Preview"
                     className="file-preview"
-                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '12px', marginBottom: '10px' }}
+                    style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '12px', marginBottom: '10px' }}
                   />
                 )}
                 <label htmlFor="cover" className="file-input-label" style={{ width: '100%', justifyContent: 'center' }}>
@@ -130,6 +164,18 @@ const Add = () => {
                     name="cover"
                   />
                 </label>
+                <div style={{ textAlign: 'center', margin: '8px 0', fontSize: '0.85rem', color: '#6b7280' }}>
+                  — OR —
+                </div>
+                <input
+                  type="text"
+                  placeholder="Paste direct Image URL (https://...)"
+                  name="cover"
+                  value={book.cover}
+                  onChange={handleChange}
+                  className="form-input"
+                  style={{ fontSize: '0.9rem' }}
+                />
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@ import mysql from 'mysql2';
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 
@@ -33,17 +34,37 @@ const db = mysql.createConnection({
     ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// upload image
+// upload image (supports multipart file or base64 JSON)
 app.post('/upload', upload.single('image'), (req, res) => {
-    if (!req.file) return res.status(400).json('No file uploaded.');
-    const host = req.get('host');
-    const protocol = req.protocol;
-    const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
-    return res.json({ imageUrl });
+    if (req.file) {
+        const host = req.get('host');
+        const protocol = req.protocol;
+        const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+        return res.json({ imageUrl });
+    }
+    if (req.body && req.body.image) {
+        try {
+            const matches = req.body.image.match(/^data:image\/([A-Za-z-+]+);base64,(.+)$/);
+            const ext = matches ? matches[1] : 'jpg';
+            const base64Data = matches ? matches[2] : req.body.image;
+            const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + '.' + ext;
+            const filePath = path.join(__dirname, 'uploads', uniqueName);
+            fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+            const host = req.get('host');
+            const protocol = req.protocol;
+            const imageUrl = `${protocol}://${host}/uploads/${uniqueName}`;
+            return res.json({ imageUrl });
+        } catch (err) {
+            console.error('Local base64 upload error:', err);
+            return res.status(500).json('Failed to save image.');
+        }
+    }
+    return res.status(400).json('No file uploaded.');
 });
 
 
