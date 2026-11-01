@@ -8,53 +8,21 @@
 
 [functions]
   directory = "../netlify/functions"
+  node_bundler = "esbuild"
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
 
-# Upload API route
+# Route all /api/* requests directly to our full Express app
 [[redirects]]
-  from = "/api/upload"
-  to = "/.netlify/functions/upload"
-  status = 200
-  force = true
-
-# Books API routes
-[[redirects]]
-  from = "/api/books/*"
-  to = "/.netlify/functions/books"
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/api/books"
-  to = "/.netlify/functions/books"
-  status = 200
-  force = true
-
-# Cart API routes
-[[redirects]]
-  from = "/api/cart/*"
-  to = "/.netlify/functions/cart"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/cart"
-  to = "/.netlify/functions/cart"
-  status = 200
-  force = true
-
-# Auth routes
-[[redirects]]
-  from = "/api/login"
-  to = "/.netlify/functions/login"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/register"
-  to = "/.netlify/functions/register"
+  from = "/api"
+  to = "/.netlify/functions/api"
   status = 200
   force = true
 

@@ -5,6 +5,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import serverless from 'serverless-http';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,12 +27,12 @@ const upload = multer({ storage });
 
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "Karachi@12345",
+    host: process.env.DB_HOST || (process.env.NETLIFY ? "gateway01.ap-northeast-1.prod.aws.tidbcloud.com" : "localhost"),
+    user: process.env.DB_USER || (process.env.NETLIFY ? "4GDYdk756scbuKt.root" : "root"),
+    password: process.env.DB_PASSWORD || (process.env.NETLIFY ? "UlXZOcT6MG1WDbig" : "Karachi@12345"),
     database: process.env.DB_NAME || "test",
-    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
-    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : (process.env.NETLIFY ? 4000 : 3306),
+    ssl: (process.env.DB_SSL === "true" || process.env.NETLIFY) ? { rejectUnauthorized: false } : false
 });
 
 app.use(express.json({ limit: '10mb' }));
@@ -339,10 +340,14 @@ app.delete("/cart/clear/:userId", (req, res) => {
 
 
 const PORT = process.env.PORT || 8800;
-app.listen(PORT, (err) => {
-    if (err) {
-        console.error("Error starting server:", err);
-        return;
-    }
-    console.log(`connected to backend on port ${PORT}!`);
-});
+if (!process.env.NETLIFY) {
+    app.listen(PORT, (err) => {
+        if (err) {
+            console.error("Error starting server:", err);
+            return;
+        }
+        console.log(`connected to backend on port ${PORT}!`);
+    });
+}
+
+export const handler = serverless(app);
