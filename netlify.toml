@@ -8,7 +8,9 @@
 
 [functions]
   directory = "../netlify/functions"
-  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
 
 # Route all /api/* requests directly to our full Express app
 [[redirects]]
