@@ -11,7 +11,7 @@
   node_bundler = "esbuild"
 
 [functions."*"]
-  external_node_modules = ["mysql2"]
+  external_node_modules = ["mysql2", "express", "cors", "multer", "serverless-http"]
 
 # Route all /api/* requests directly to our full Express app
 [[redirects]]
