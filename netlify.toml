@@ -10,8 +10,8 @@
   directory = "../netlify/functions"
   node_bundler = "esbuild"
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+[functions."*"]
+  external_node_modules = ["mysql2"]
 
 # Route all /api/* requests directly to our full Express app
 [[redirects]]
