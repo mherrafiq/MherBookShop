@@ -1,16 +1,14 @@
 [build]
-  base = "client"
-  publish = "build"
-  command = "npm run build"
+  base = ""
+  publish = "client/build"
+  command = "npm --prefix client install && npm --prefix client run build"
 
 [build.environment]
   CI = "false"
 
 [functions]
-  directory = "../netlify/functions"
-
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 # Route all /api/* requests directly to our full Express app
 [[redirects]]
